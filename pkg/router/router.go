@@ -14,4 +14,20 @@ func InitRouter(r *gin.Engine) {
 	// pod
 	r.GET("/namespace/:namespaceName/pods", apis.GetPods)
 	r.GET("/namespace/:namespaceName/pod/:podName/container/:containerName", apis.ExecContainer)
+
+	// service
+	r.GET("/namespace/:namespaceName/services", apis.GetServices)
+
+	// deployment
+	r.GET("/namespace/:namespaceName/deployments", apis.GetDeployments)
+
+	// statefulset
+	r.GET("/namespace/:namespaceName/statefulsets", apis.GetStatefulSets)
+
+	// configmap
+	r.GET("/namespace/:namespaceName/configmaps", apis.GetConfigMaps)
+
+	// secret
+	r.GET("/namespace/:namespaceName/secrets", apis.GetSecrets)
+
 }
