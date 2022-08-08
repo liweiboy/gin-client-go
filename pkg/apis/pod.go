@@ -16,6 +16,25 @@ func GetPods(c *gin.Context) {
 	}
 }
 
+type podDeleteDto struct {
+	Names []string `json:"names"`
+}
+
+func DeletePods(c *gin.Context) {
+	namespaceName := c.Param("namespaceName")
+	podDeleteDto := &podDeleteDto{}
+	if err := c.ShouldBind(&podDeleteDto); err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+	err := service.DeletePods(namespaceName, podDeleteDto.Names)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
+	} else {
+		c.JSON(http.StatusOK, "success")
+	}
+}
+
 func ExecContainer(c *gin.Context) {
 	namespaceName := c.Param("namespaceName")
 	podName := c.Param("podName")

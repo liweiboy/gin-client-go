@@ -13,6 +13,7 @@ func InitRouter(r *gin.Engine) {
 	r.GET("/namespaces", apis.GetNamespace)
 	// pod
 	r.GET("/namespace/:namespaceName/pods", apis.GetPods)
+	r.DELETE("/namespace/:namespaceName/pods", apis.DeletePods)
 	r.GET("/namespace/:namespaceName/pod/:podName/container/:containerName", apis.ExecContainer)
 
 	// service

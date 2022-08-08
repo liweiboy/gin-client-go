@@ -27,6 +27,20 @@ func GetPods(namespace string) ([]v1.Pod, error) {
 	return list.Items, nil
 }
 
+func DeletePods(namespace string, names []string) error {
+	clientset, err := client.GetClientset()
+	if err != nil {
+		return err
+	}
+	for _, name := range names {
+		err := clientset.CoreV1().Pods(namespace).Delete(context.TODO(), name, metav1.DeleteOptions{})
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // ----------------webssh部分 需要用到websocket协议-------------------------
 
 type WsMessage struct {
