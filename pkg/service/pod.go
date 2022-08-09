@@ -204,13 +204,14 @@ func (handler *streamHandler) Read(p []byte) (size int, err error) {
 		return
 	}
 	if err = json.Unmarshal(msg.Data, &xtermMsg); err != nil {
+		klog.Errorln(err)
 		return
 	}
 	if xtermMsg.MsgType == "resize" {
 		handler.resizeEvent <- remotecommand.TerminalSize{Width: xtermMsg.Cols, Height: xtermMsg.Rows}
 	} else if xtermMsg.MsgType == "input" {
 		size = len(xtermMsg.Input)
-		copy(p, xtermMsg.MsgType)
+		copy(p, xtermMsg.Input)
 	}
 	return
 }
