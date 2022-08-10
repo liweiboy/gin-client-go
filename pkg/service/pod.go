@@ -1,6 +1,7 @@
 package service
 
 import (
+	"bufio"
 	"context"
 	"encoding/json"
 	"errors"
@@ -266,4 +267,60 @@ func WebSSH(namespaceName, podName, containerName, method string, resp http.Resp
 		return err
 	}
 	return err
+}
+
+// ------------ pod log -----------------
+type streamHandlerLog struct {
+	wsConn *WsConnection
+}
+
+func (handler *streamHandlerLog) write(namespaceName, podName, containerName string) {
+	clientset, err := client.GetClientset()
+	if err != nil {
+		klog.Errorln(err)
+		handler.wsConn.WsClose()
+		return
+	}
+	var lines int64 = 100
+	req := clientset.CoreV1().Pods(namespaceName).GetLogs(podName, &v1.PodLogOptions{
+		Container: containerName,
+		Follow:    true,
+		TailLines: &lines,
+	})
+	stream, err := req.Stream(context.TODO())
+	if err != nil {
+		handler.wsConn.WsClose()
+		return
+	}
+	defer stream.Close()
+	r := bufio.NewReader(stream)
+	for {
+		bytes, err := r.ReadBytes('\n')
+		if err != nil {
+			handler.wsConn.WsClose()
+			break
+		}
+		if len(bytes) == 0 {
+			continue
+		}
+		err = handler.wsConn.WsWrite(websocket.TextMessage, bytes)
+		if err != nil {
+			klog.Errorln(err)
+			handler.wsConn.WsClose()
+			break
+		}
+	}
+	return
+}
+
+func WebSSHLog(namespaceName, podName, containerName string, resp http.ResponseWriter, req *http.Request) error {
+	wsConn, err := InitWebsocket(resp, req)
+	if err != nil {
+		return err
+	}
+	handler := &streamHandlerLog{
+		wsConn: wsConn,
+	}
+	handler.write(namespaceName, podName, containerName)
+	return nil
 }

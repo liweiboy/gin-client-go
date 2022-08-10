@@ -15,6 +15,7 @@ func InitRouter(r *gin.Engine) {
 	r.GET("/namespace/:namespaceName/pods", apis.GetPods)
 	r.DELETE("/namespace/:namespaceName/pods", apis.DeletePods)
 	r.GET("/namespace/:namespaceName/pod/:podName/container/:containerName", apis.ExecContainer)
+	r.GET("/namespace/:namespaceName/pod/:podName/container/:containerName/logs", apis.LogContainer)
 
 	// service
 	r.GET("/namespace/:namespaceName/services", apis.GetServices)

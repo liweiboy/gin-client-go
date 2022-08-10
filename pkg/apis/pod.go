@@ -45,3 +45,13 @@ func ExecContainer(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, err.Error())
 	}
 }
+
+func LogContainer(c *gin.Context) {
+	namespaceName := c.Param("namespaceName")
+	podName := c.Param("podName")
+	containerName := c.Param("containerName")
+	err := service.WebSSHLog(namespaceName, podName, containerName, c.Writer, c.Request)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
+	}
+}
